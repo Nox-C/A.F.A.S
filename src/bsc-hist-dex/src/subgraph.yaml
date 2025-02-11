@@ -1,0 +1,39 @@
+specVersion: 0.0.2
+language: wasm/assemblyscript
+source:
+  kind: ethereum/events
+  network: bsc
+  nodes:
+    - https://bsc-dataseed.binance.org/
+
+dataSources:
+  - kind: ethereum/contract
+    name: DEX
+    network: bsc
+    source:
+      address: "0x..." # Replace with actual DEX addresses
+      startBlock: 1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      entities:
+        - PriceData
+      abis:
+        - name: DEX
+          file: ./abis/DEX.json
+      eventHandlers:
+        - event: PriceUpdated(indexed address, indexed string, indexed string, uint256)
+          handler: handlePriceUpdated
+      file: ./src/mapping.ts
+
+entities:
+  - PriceData:
+      fields:
+        - id: ID!
+        - dexAddress: Bytes!
+        - asset: String!
+        - price: BigDecimal!
+        - timestamp: BigInt!
+
+# Additional configurations for the subgraph
