@@ -6,7 +6,7 @@ const provider = new JsonRpcProvider(config.API_URL);
 
 // Function to get the latest block
 async function getLatestBlock() {
-    const blockNumber = "latest"; // Fetch the latest block
+    const blockNumber = 'latest'; // Fetch the latest block
     const block = await provider.getBlock(blockNumber);
     console.log('Latest Block:', block);
 }

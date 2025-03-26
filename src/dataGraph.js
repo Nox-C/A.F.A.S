@@ -1,5 +1,5 @@
-const EventEmitter = require('events');
-const winston = require('winston');
+import EventEmitter from 'events';
+import winston from 'winston';
 
 class DataGraph extends EventEmitter {
     constructor(config) {
@@ -195,4 +195,4 @@ class DataGraph extends EventEmitter {
     }
 }
 
-module.exports = DataGraph;
+export default DataGraph;

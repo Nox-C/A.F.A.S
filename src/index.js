@@ -1,6 +1,8 @@
-require('dotenv').config();
-const winston = require('winston');
-const ArbitrageSynchronizer = require('./arbitrageSynchronizer');
+import dotenv from 'dotenv';
+import winston from 'winston';
+import ArbitrageSynchronizer from './arbitrageSynchronizer.js';
+
+dotenv.config();
 
 // Configure global logger
 const logger = winston.createLogger({
@@ -18,21 +20,52 @@ const logger = winston.createLogger({
 // Configuration for DEXs and tokens
 const config = {
     dexes: [
-        'PancakeSwap', 
-        'THENA', 
-        'DODORouter', 
-        'PancakeSwapStableswap', 
+        'PancakeSwap',
+        'THENA',
+        'DODORouter',
+        'PancakeSwapStableswap',
         'UnchainXRouter'
     ],
-    tokens: [
-        'BNB', 
-        'CAKE', 
-        'USDT', 
-        'XVS', 
-        'BAKE'
+    // Base assets (major tokens)
+    baseAssets: [
+        'BNB',   // BNB Chain native token
+        'USDT',  // Tether
+        'BUSD',  // Binance USD
+        'ETH',   // Ethereum
+        'USDC'   // USD Coin
     ],
-    minProfitThreshold: 2.5, // 2.5% minimum profit
-    executionTimeLimit: 500 // 500ms execution window
+    // Trading pairs (DeFi tokens)
+    tradingAssets: [
+        'CAKE',  // PancakeSwap
+        'XVS',   // Venus
+        'BAKE',  // BakerySwap
+        'THE',   // THENA
+        'DODO',  // DODO
+        'ANKR',  // Ankr
+        'ALPHA', // Alpha Finance
+        'BAND',  // Band Protocol
+        'BSW',   // Biswap
+        'LINK'   // Chainlink
+    ],
+    // Stable pairs for arbitrage
+    stableAssets: [
+        'DAI',   // DAI Stablecoin
+        'TUSD',  // TrueUSD
+        'UST',   // TerraUSD
+        'FRAX',  // Frax
+        'MAI'    // Mai
+    ],
+    // Performance and safety settings
+    settings: {
+        minProfitThreshold: 2.5,    // 2.5% minimum profit
+        executionTimeLimit: 500,     // 500ms execution window
+        maxRequestsPerSecond: 20,    // Stay under Alchemy's 25 rps limit
+        batchSize: 10,               // Number of requests to batch
+        batchTimeout: 100,           // ms to wait before processing incomplete batch
+        cacheTimeout: 1000,          // ms to cache blockchain data
+        maxConcurrentPairs: 50,      // Maximum number of pairs to monitor concurrently
+        rotationInterval: 60000      // ms between pair rotations (1 minute)
+    }
 };
 
 // Main application function

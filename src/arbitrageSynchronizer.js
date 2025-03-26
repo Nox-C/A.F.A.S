@@ -1,9 +1,25 @@
-const winston = require('winston');
-const axios = require('axios');
-const WebSocketManager = require('./webSocketManager');
+import winston from 'winston';
+import axios from 'axios';
+import WebSocketManager from './webSocketManager.js';
 
 // Custom Logger Setup
 const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+    ),
+    transports: [
+        new winston.transports.File({ filename: 'app.log' }),
+        new winston.transports.Console()
+    ]
+});
+
+// Export logger for use in other modules
+export const arbitrageLogger = logger;
+
+// Custom Logger Setup for the class
+const classLogger = winston.createLogger({
     level: 'info',
     format: winston.format.combine(
         winston.format.timestamp(),
@@ -19,6 +35,9 @@ const logger = winston.createLogger({
 
 class ArbitrageSynchronizer {
     constructor(config) {
+        // Logging setup first
+        this.logger = classLogger;
+
         // Core configuration
         this.config = config;
         this.dexes = config.dexes || [];
@@ -30,6 +49,14 @@ class ArbitrageSynchronizer {
         // Timestamp and execution tracking
         this.lastUpdateTimestamp = null;
         this.executionTimeLimit = config.executionTimeLimit || 500; // 500ms execution window
+
+        // Performance metrics
+        this.metrics = {
+            messageCount: 0,
+            processedCount: 0,
+            averageProcessingTime: 0,
+            lastMetricsReset: Date.now()
+        }
         
         // Performance and monitoring
         this.performanceMetrics = {
@@ -40,9 +67,6 @@ class ArbitrageSynchronizer {
 
         // Liquidity and token information cache
         this.liquidityCache = this.initializeLiquidityCache();
-
-        // Logging
-        this.logger = logger;
 
         // WebSocket Management
         this.webSocketManager = new WebSocketManager(config, this);
@@ -339,7 +363,12 @@ class ArbitrageSynchronizer {
             successRate: (this.performanceMetrics.profitableOpportunities / this.performanceMetrics.opportunitiesAnalyzed) * 100
         };
     }
+
+    // Get performance metrics
+    getMetrics() {
+        return this.metrics;
+    }
 }
 
 // Export the class for use in other modules
-module.exports = ArbitrageSynchronizer;
+export default ArbitrageSynchronizer;
